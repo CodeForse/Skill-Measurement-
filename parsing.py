@@ -1,3 +1,4 @@
+
 from re import sub
 
 import pydantic
@@ -6,7 +7,11 @@ import numpy as np
 from bs4 import BeautifulSoup 
 from selenium.webdriver import Chrome
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
+
 
 # main problem - define how to define id or in general players into sample
 
@@ -23,27 +28,7 @@ urlDT_overview="https://destinytracker.com/destiny-2/profile/steam/4611686018490
 request_overview=requests.get(urlDT_overview)
 soup_overview= BeautifulSoup(request_overview.text,'lxml')
 
-# nickname=soup_overview.find('span',class_='trn-ign__username').text.strip('\n')
-# nickname=nickname[:nickname.find('\n')].strip()
 
-# numViews=soup_overview.find('div',class_='ph-details__subtitle').find_all('span')[1]
-
-# numViews=getNumbersInt(numViews)  #damn optimization 
-
-# id_bungie=soup_overview.find('div','ph-details__identifier').find('span','ph-details__name').find('span','trn-ign__discriminator')
-# id_bungie=getNumbersInt(id_bungie)
-
-# urlDT_detailed="https://destinytracker.com/destiny-2/profile/steam/4611686018490833395/detailed?mode=AllPvP"
-# request_detailed=requests.get(urlDT_overview)
-# soup_detailed= BeautifulSoup(request_detailed.text,'lxml')
-
-# kd_overall=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').find('div','stat align-left expandable').find('span','value').text)
-
-# hoursPlayed=soup_overview.find('div','segment-stats').findAll('span','matches')[1]
-# hoursPlayed=getNumbersInt(hoursPlayed)
-
-# favor_weapon=soup_overview.find('div',class_='weapons-list').find('div',class_='name').text
-# print(favor_weapon) #most used last 30 
 class Player(pydantic.BaseModel):
     prime_steam_id: str
     nick_name: str
@@ -55,30 +40,10 @@ class Player(pydantic.BaseModel):
     show_offName: bool
 
 
-    # def setPlayer(self,steam_id:str):
-    #     urlDT_overview=f"https://destinytracker.com/destiny-2/profile/steam/{steam_id}/overview"
-    #     request_overview=requests.get(urlDT_overview)
-    #     soup_overview= BeautifulSoup(request_overview.text,'lxml')
+    
 
-    #     self.prime_steam_id=steam_id
-
-    #     nickname=soup_overview.find('span',class_='trn-ign__username').text.strip('\n')
-    #     self.nickname=nickname[:nickname.find('\n')].strip()
-
-    #     numViews=soup_overview.find('div',class_='ph-details__subtitle').find_all('span')[1]
-    #     self.numViews=getNumbersInt(numViews)  #damn optimization 
-
-    #     id_bungie=soup_overview.find('div','ph-details__identifier').find('span','ph-details__name').find('span','trn-ign__discriminator')
-    #     self.id_bungie=getNumbersInt(id_bungie)
-
-    #     self.kd_overall=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').find('div','stat align-left expandable').find('span','value').text)
-    #     self.win_rate=getNumbersInt(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').findAll('div','stat align-left expandable')[2].find('span','value').text)
-
-    #     hoursPlayed=soup_overview.find('div','segment-stats').findAll('span','matches')[1]
-    #     self.hours_played=getNumbersInt(hoursPlayed)
-
-    #sl=(index)3.5% adjusted rarity to compare with, the idea is to get dummy variable - emblem is rare or not
-def getEmblemRarity(steam_id:str,SL:float):
+#sl=(index)3.5% adjusted rarity to compare with, the idea is to get dummy variable - emblem is rare or not
+def getEmblemRarity(steam_id:str,SignLevel:float): #takes to much time so i prefer write new method to scrap for the whole sample at once
     urlBungie='https://www.bungie.net/en/Profile/GameHistory/3/'+steam_id
     soupBungie=BeautifulSoup(requests.get(urlBungie).text,'lxml') 
 
@@ -88,24 +53,41 @@ def getEmblemRarity(steam_id:str,SL:float):
     #warmind part, percentage is different from stated in https://bray.tech/
     options = webdriver.ChromeOptions()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver=Chrome(executable_path='C:/Users/User/Downloads/chromedriver_win32/chromedriver.exe',options=options)
-    
-    page=3
+    options.add_argument("start-maximized")
+    #driver=Chrome(executable_path='D:/Users/Аслан/Desktop/программирование/PythonDanila/chromedriver.exe',options=options)
+    driver=Chrome(service=Service(ChromeDriverManager().install()),options=options)
+    page=4
+    urlWarmind=f'https://warmind.io/analytics/item/emblems?page{page}'
+    driver.get(urlWarmind)
     while(page>0):
-        urlWarmind=f'https://warmind.io/analytics/item/emblems?page{page}'
+        
+        
+        
+        sleep(5)
+        
+        
+            # rarity=driver.find_element(By.XPATH,"//img[@src='https://www.bungie.net/common/destiny2_content/icons/7e4ad40ea82544394255424482f2f490.jpg']")
+            #print(rarity)
+            
+            # print(driver.find_element(By.CLASS_NAME,'col-lg-2').find_element(By.))
+        soup=BeautifulSoup(driver.page_source,'lxml')
+
+        #here i'll use adjusted value of rarity that is in general bigger than global rarity, so it will be easier to compare rares
+        #to track global rariry just change col-lg-6 to col-lg-5
+        try:
+            rarity=soup.find(attrs={'src':emblem}).parent.find('div','col-lg-6').find('span').text
+            rarity=float(rarity[:-1])
+            return rarity<=SignLevel # 0 - not rare; 1 - rare
+                   
+        except: pass
+        
+        
+        if(page>1):
+            driver.find_element(By.LINK_TEXT,'Next Page').click()
+        
         page-=1
-        driver.get(urlWarmind)
-        sleep(1500)
-        rarity=driver.find_element_by_class_name(name='panel-body')
-        print(rarity)
-        # soupWarmind=BeautifulSoup(requests.get(urlWarmind).text,'lxml')
-        # try:
-        #     rarity=soupWarmind.find('div','col-xs-12').find('div','panel-body')
-        #     print(rarity)
-        # except:
-        #     print('not found')
-        #     continue
-    driver.close()
+    driver.close()      
+    
         
         
         
@@ -137,10 +119,10 @@ def setPlayer(steam_id:str):
 
         show_off= bool(nickname.__len__()<=6) #defining show-off guy is a guestion to ML, here i define it as just short nickname
 
-        player=Player(prime_steam_id=prime_steam_id,nick_name=nickname,id_bungie=id_bungie,views=numViews,kd_overall=kd_overall, win_rate=win_rate,hours_played=hoursPlayed, show_offName=show_off)
-        return(player)
+        return Player(prime_steam_id=prime_steam_id,nick_name=nickname,id_bungie=id_bungie,views=numViews,kd_overall=kd_overall, win_rate=win_rate,hours_played=hoursPlayed, show_offName=show_off)
+        
 
-getEmblemRarity('4611686018490833395',3.5)
+print(getEmblemRarity('4611686018490833395',3.5)) 
 
 # try:
 #     file=open('players.json','a')
