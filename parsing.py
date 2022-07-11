@@ -57,7 +57,7 @@ def getEmblemRarity(steam_id:str,SignLevel:float): #takes to much time so i pref
     #driver=Chrome(executable_path='D:/Users/Аслан/Desktop/программирование/PythonDanila/chromedriver.exe',options=options)
     driver=Chrome(service=Service(ChromeDriverManager().install()),options=options)
     page=4
-    urlWarmind=f'https://warmind.io/analytics/item/emblems?page{page}'
+    urlWarmind=f'https://warmind.io/analytics/item/emblems?page={page}'
     driver.get(urlWarmind)
     while(page>0):
         
@@ -77,17 +77,18 @@ def getEmblemRarity(steam_id:str,SignLevel:float): #takes to much time so i pref
         try:
             rarity=soup.find(attrs={'src':emblem}).parent.find('div','col-lg-6').find('span').text
             rarity=float(rarity[:-1])
-            return rarity<=SignLevel # 0 - not rare; 1 - rare
+            return rarity<=SignLevel # 0 - not rare; 1 - rare 
                    
         except: pass
         
         
         if(page>1):
-            driver.find_element(By.LINK_TEXT,'Next Page').click()
+            driver.find_element(By.LINK_TEXT,'Previous Page').click() #optimization by logic
         
         page-=1
-    driver.close()      
     
+    driver.close()      
+    return False #suppose that all new emblems(that are not in the site) are not rare (0)
         
         
         
@@ -132,5 +133,8 @@ print(getEmblemRarity('4611686018490833395',3.5))
 # file.write(setPlayer('4611686018493562197').json()+',\n')
 
 # file.close()
+
+
+
 
 
