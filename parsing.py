@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 
-
+import gettingPlayers
 # main problem - define how to define id or in general players into sample
 
 # https://destinytracker.com/destiny-2/profile/steam/4611686018490833395/overview
@@ -48,7 +48,7 @@ class PlayerList(pydantic.BaseModel):
     
 
 #sl=(index)3.5% adjusted rarity to compare with, the idea is to get dummy variable - emblem is rare or not
-def getEmblemRarity(steam_id:str,SignLevel:float): #takes to much time so i prefer write new method to scrap for the whole sample at once
+def getEmblemRarity(steam_id:str,SignLevel:float=3.5): #takes to much time so i prefer write new method to scrap for the whole sample at once
     urlBungie='https://www.bungie.net/en/Profile/GameHistory/3/'+steam_id
     soupBungie=BeautifulSoup(requests.get(urlBungie).text,'lxml') 
 
@@ -139,7 +139,7 @@ def getAllEmblems():
         file.close()
 
                
-def getEmblemRarity_sampleBased(sample_steam_id:List[str],SignLevel:float=3.5):
+def set_dataset(sample_steam_id:List[str],SignLevel:float=3.5):
     try:
         emblem_file=open('emblems.json','r')  
     except: #if warmind was updated with new emblems - just delete the current file [no user interface, but maybe i'll make it]
@@ -148,39 +148,53 @@ def getEmblemRarity_sampleBased(sample_steam_id:List[str],SignLevel:float=3.5):
 
     emblems=emblemList.parse_obj(json.loads(emblem_file.read()))  
     players=[]
-    for steam_id in sample_steam_id:
-        urlDT_overview=f"https://destinytracker.com/destiny-2/profile/steam/{steam_id}/overview"
-        request_overview=requests.get(urlDT_overview)
-        soup_overview= BeautifulSoup(request_overview.text,'lxml')
+    i=1
+    try:
 
+        for steam_id in sample_steam_id:
+            
+            urlDT_overview=f"https://destinytracker.com/destiny-2/profile/steam/{steam_id}/overview"
+            request_overview=requests.get(urlDT_overview)
+
+            sleep(0.5)
+            soup_overview= BeautifulSoup(request_overview.text,'lxml')
+
+
+            nickname=soup_overview.find('span',class_='trn-ign__username').text.strip('\n')
+            nickname=nickname[:nickname.find('\n')].strip()
+
+            numViews=soup_overview.find('div',class_='ph-details__subtitle').find_all('span')[1]
+            numViews=getNumbersInt(numViews)  #damn optimization 
+
+            id_bungie=soup_overview.find('div','ph-details__identifier').find('span','ph-details__name').find('span','trn-ign__discriminator')
+            id_bungie=getNumbersInt(id_bungie)
+
+            kd_overall=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').find('div','stat align-left expandable').find('span','value').text)
+            win_rate=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').findAll('div','stat align-left expandable')[2].find('span','value').text.replace('%',''))
+
+            hoursPlayed=soup_overview.find('div','segment-stats').findAll('span','matches')[1]
+            hoursPlayed=getNumbersInt(hoursPlayed)
+
+            show_off= bool(nickname.__len__()<=6)
+
+            urlBungie='https://www.bungie.net/en/Profile/GameHistory/3/'+steam_id
+            soupBungie=BeautifulSoup(requests.get(urlBungie).text,'lxml') 
+            
+            sleep(0.5)
+
+            emblem=str(soupBungie.find('div','select-option js-option-selectable').find('div','icon'))
+            emblem='https://bungie.net'+emblem[48:len(emblem)-10]
+            
+            emblem_rarity=next((it for it in emblems.emblems if it.src==emblem), None).rarity<SignLevel
+            players.append(Player(prime_steam_id=steam_id,nick_name=nickname,id_bungie=id_bungie,views=numViews,kd_overall=kd_overall, win_rate=win_rate,hours_played=hoursPlayed, show_offName=show_off,emblem_isRare=emblem_rarity))
+            print('player is setted',i)
+            i+=1
+    except:
+        PlayersDataSet=open('players_dataset.json','w+')
+        PlayersDataSet.write(PlayerList(players=players).json())
+        PlayersDataSet.close()
+        pass
         
-
-        nickname=soup_overview.find('span',class_='trn-ign__username').text.strip('\n')
-        nickname=nickname[:nickname.find('\n')].strip()
-
-        numViews=soup_overview.find('div',class_='ph-details__subtitle').find_all('span')[1]
-        numViews=getNumbersInt(numViews)  #damn optimization 
-
-        id_bungie=soup_overview.find('div','ph-details__identifier').find('span','ph-details__name').find('span','trn-ign__discriminator')
-        id_bungie=getNumbersInt(id_bungie)
-
-        kd_overall=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').find('div','stat align-left expandable').find('span','value').text)
-        win_rate=float(soup_overview.find('div','segment-stats regular-stats card bordered header-bordered responsive').findAll('div','stat align-left expandable')[2].find('span','value').text.replace('%',''))
-
-        hoursPlayed=soup_overview.find('div','segment-stats').findAll('span','matches')[1]
-        hoursPlayed=getNumbersInt(hoursPlayed)
-
-        show_off= bool(nickname.__len__()<=6)
-
-        urlBungie='https://www.bungie.net/en/Profile/GameHistory/3/'+steam_id
-        soupBungie=BeautifulSoup(requests.get(urlBungie).text,'lxml') 
-
-        emblem=str(soupBungie.find('div','select-option js-option-selectable').find('div','icon'))
-        emblem='https://bungie.net'+emblem[48:len(emblem)-10]
-        
-        emblem_rarity=next((it for it in emblems.emblems if it.src==emblem), None).rarity<SignLevel
-        players.append(Player(prime_steam_id=steam_id,nick_name=nickname,id_bungie=id_bungie,views=numViews,kd_overall=kd_overall, win_rate=win_rate,hours_played=hoursPlayed, show_offName=show_off,emblem_isRare=emblem_rarity))
-    
     PlayersDataSet=open('players_dataset.json','w+')
     PlayersDataSet.write(PlayerList(players=players).json())
     PlayersDataSet.close()
@@ -221,7 +235,12 @@ def setPlayer(steam_id:str):
     
 # print(getEmblemRarity('4611686018493562197',3.5)) 
 #getAllEmblems()
-getEmblemRarity_sampleBased(['4611686018493562197'])
+if __name__ == '__main__':
+    #gettingPlayers.writeAllPlayers(10)
+    primeKey_SteamFile=open('primeKeyID.txt','r')
+    steam_id_list=primeKey_SteamFile.read().split(',')[:-1]
+    
+    set_dataset(steam_id_list)
 
 # try:
 #     file=open('players.json','a')
