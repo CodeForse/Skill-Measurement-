@@ -1,6 +1,7 @@
 
 from re import sub
-
+from typing import List
+import json
 import pydantic
 import requests
 import numpy as np
@@ -87,11 +88,61 @@ def getEmblemRarity(steam_id:str,SignLevel:float): #takes to much time so i pref
         
         page-=1
     
-    driver.close()      
+    driver.close()          
     return False #suppose that all new emblems(that are not in the site) are not rare (0)
+
+class emblem(pydantic.BaseModel):
+    src: str
+    rarity: float
+class emblemList(pydantic.BaseModel):
+    emblems: List[emblem]
+def getAllEmblems():
+    if(True):
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_argument("start-maximized")        
+        driver=Chrome(service=Service(ChromeDriverManager().install()),options=options)  
+        page=4 #last page may change over a time
+        urlWarmind=f'https://warmind.io/analytics/item/emblems?page={page}'
+        driver.get(urlWarmind)
+        
+
+        list_emblems=[]
+        while(page>0):
+            sleep(5)
+            soup=BeautifulSoup(driver.page_source,'lxml')
+            #make a table and then findall?
+            imgs=soup.find_all('img')
+            for img in imgs:
+                
+                if(img.has_attr('id') and img.get('id')!='modal-image'):
+                    src=img.get('src')
+                    #here i'll use adjusted value of rarity that is in general bigger than global rarity, so it will be easier to compare rares
+                    #to track global rariry just change col-lg-6 to col-lg-5
+                    rarity=float(img.parent.find('div','col-lg-6').find('span').text[:-1])
+                    list_emblems.append(emblem(src= src,rarity= rarity))
+
+            if(page>1):
+                driver.find_element(By.LINK_TEXT,'Previous Page').click() #optimization by logic
+            page-=1
         
         
-        
+
+        driver.close()  
+
+        file=open('emblems.json','w')
+        file.write(emblemList(emblems=list_emblems).json())
+        file.close()
+
+               
+def getEmblemRarity_sampleBased(sample:List[Player]):
+    try:
+        emblem_file=open('emblems.json','r')  
+    except: #if warmind was updated with new emblems - just delete the current file [no user interface, but maybe i'll make it]
+        getAllEmblems()
+        emblem_file=open('emblems.json','r')
+
+    emblems=emblem_file.read()   
 
 
 
@@ -122,8 +173,9 @@ def setPlayer(steam_id:str):
 
         return Player(prime_steam_id=prime_steam_id,nick_name=nickname,id_bungie=id_bungie,views=numViews,kd_overall=kd_overall, win_rate=win_rate,hours_played=hoursPlayed, show_offName=show_off)
         
-
-print(getEmblemRarity('4611686018490833395',3.5)) 
+    
+# print(getEmblemRarity('4611686018493562197',3.5)) 
+#getAllEmblems()
 
 # try:
 #     file=open('players.json','a')
@@ -133,8 +185,5 @@ print(getEmblemRarity('4611686018490833395',3.5))
 # file.write(setPlayer('4611686018493562197').json()+',\n')
 
 # file.close()
-
-
-
 
 
