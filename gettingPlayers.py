@@ -10,6 +10,8 @@ import time
 from selenium.webdriver import Chrome
 import selenium.webdriver
 import re
+
+
 # urlDT_nullPlayer="https://destinytracker.com/destiny-2/profile/steam/4611686018490833395/overview"
 # request_overview=requests.get(urlDT_nullPlayer)
 # soup_overview= BeautifulSoup(request_overview.text,'lxml')
@@ -64,10 +66,10 @@ def writeAllPlayers(page:int):
     for link in soup.find_all('a'):
      if('destiny-2/profile' in str(link.get('href'))):
             id=str(link.get('href'))[len('/destiny-2/profile/steam/'):]
-            primeKey_SteamFile.write(id+'\n')
+            primeKey_SteamFile.write(id+',')
             
     
     primeKey_SteamFile.close()
     
-    
+writeAllPlayers(10)
 
