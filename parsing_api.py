@@ -174,9 +174,151 @@ win_ratio_rank=person_json['stats']['wl']['rank']
 win_ratio_percentile=person_json['stats']['wl']['percentile']
 win_ratio_value=person_json['stats']['wl']['value']
 
-#longest_
+#longest_kill_spree
+longest_kill_spree_rank=person_json['stats']['longestKillSpree']['rank']
+longest_kill_spree_percentile=person_json['stats']['longestKillSpree']['percentile']
+longest_kill_spree_value=person_json['stats']['longestKillSpree']['value']
+
+#longest_single_life
+longest_single_life_rank=person_json['stats']['longestSingleLife']['rank']
+longest_single_life_percentile=person_json['stats']['longestSingleLife']['percentile']
+longest_single_life_value=person_json['stats']['longestSingleLife']['value']
+
+#most_precision_kills
+most_precision_kills_rank=person_json['stats']['mostPrecisionKills']['rank']
+most_precision_kills_percentile=person_json['stats']['mostPrecisionKills']['percentile']
+most_precision_kills_value=person_json['stats']['mostPrecisionKills']['value']
+
+#combat_rating
+combat_rating_rank=person_json['stats']['combatRating']['rank']
+combat_rating_percentile=person_json['stats']['combatRating']['percentile']
+combat_rating_value=person_json['stats']['combatRating']['value']
+
+#precision_kills
+precision_kills_rank=person_json['stats']['precisionKills']['rank']
+precision_kills_percentile=person_json['stats']['precisionKills']['percentile']
+precision_kills_value=person_json['stats']['precisionKills']['value']
+
+#activities_entered: matches
+activities_entered_rank=person_json['stats']['activitiesEntered']['rank']
+activities_entered_percentile=person_json['stats']['activitiesEntered']['percentile']
+activities_entered_value=person_json['stats']['activitiesEntered']['value']
+
+#activities_won: wins but do we need it if we have winratio
+activities_won_rank=person_json['stats']['activitiesWon']['rank']
+activities_wond_percentile=person_json['stats']['activitiesWon']['percentile']
+activities_won_value=person_json['stats']['activitiesWon']['value']
+
+#zones_captured
+zones_captured_rank=person_json['stats']['zonesCaptured']['rank']
+zones_captured_percentile=person_json['stats']['zonesCaptured']['percentile']
+zones_captured_value=person_json['stats']['zonesCaptured']['value']
+
+#zones_neutralized #dont know what does it means exactly i quess it's decapturing to neutral zone, the enemy zone
+zones_neutralized_rank=person_json['stats']['zonesNeutralized']['rank']
+zones_neutralized_percentile=person_json['stats']['zonesNeutralized']['percentile']
+zones_neutralized_value=person_json['stats']['zonesNeutralized']['value']
+
+#resurrections_performed 
+resurrections_performed_rank=person_json['stats']['resurrectionsPerformed']['rank']
+resurrections_performed_percentile=person_json['stats']['resurrectionsPerformed']['percentile']
+resurrections_performed_value=person_json['stats']['resurrectionsPerformed']['value']
+
+#resurrections_received too correleted to regimes 
+resurrections_received_rank=person_json['stats']['resurrectionsReceived']['rank']
+resurrections_received_percentile=person_json['stats']['resurrectionsReceived']['percentile']
+resurrections_received_value=person_json['stats']['resurrectionsReceived']['value']
+
+#defensive_kills
+defensive_kills_rank=person_json['stats']['defensiveKills']['rank']
+defensive_kills_percentile=person_json['stats']['defensiveKills']['percentile']
+defensive_kills_value=person_json['stats']['defensiveKills']['value']
+
+#offensive_kills ###FUCK and they don't measure this cool thing
+offensive_kills_rank=person_json['stats']['offensiveKills']['rank']
+offensive_kills_percentile=person_json['stats']['offensiveKills']['percentile']
+offensive_kills_value=person_json['stats']['offensiveKills']['value']
+
+#orbs_dropped #no regime for this currently (interp as old player)
+orbs_dropped_rank=person_json['stats']['orbsDropped']['rank']
+orbs_dropped_percentile=person_json['stats']['orbsDropped']['percentile']
+orbs_dropped_value=person_json['stats']['orbsDropped']['value']
+
+#orbs_gathered 
+orbs_gathered_rank=person_json['stats']['orbsGathered']['rank']
+orbs_gathered_percentile=person_json['stats']['orbsGathered']['percentile']
+orbs_gathered_value=person_json['stats']['orbsGathered']['value']
+
+#relics_captured # not pvp mode currently
+relics_captured_rank=person_json['stats']['relicsCaptured']['rank']
+relics_captured_percentile=person_json['stats']['relicsCaptured']['percentile']
+relics_captured_value=person_json['stats']['relicsCaptured']['value']
+
+#orbs_dropped_per_game null
+orbs_dropped_per_game_rank=person_json['stats']['orbsDroppedPerGame']['rank']
+orbs_dropped_per_game_percentile=person_json['stats']['orbsDroppedPerGame']['percentile']
+orbs_dropped_per_game_value=person_json['stats']['orbsDroppedPerGame']['value']
+
+#orbs_gathered_per_game null
+orbs_gathered_per_game_rank=person_json['stats']['orbsGatheredPerGame']['rank']
+orbs_gathered_per_game_percentile=person_json['stats']['orbsGatheredPerGame']['percentile']
+orbs_gathered_per_game_value=person_json['stats']['orbsGatheredPerGame']['value']
+
+#relics_captured_per_game null
+relics_captured_per_game_rank=person_json['stats']['relicsCapturedPerGame']['rank']
+relics_captured_per_game_percentile=person_json['stats']['relicsCapturedPerGame']['percentile']
+relics_captured_per_game_value=person_json['stats']['relicsCapturedPerGame']['value']
+
+#minutes_played_total
+minutes_played_total_rank=person_json['stats']['minutesPlayedTotal']['rank']
+minutes_played_total_percentile=person_json['stats']['minutesPlayedTotal']['percentile']
+minutes_played_total_value=person_json['stats']['minutesPlayedTotal']['value']
+
+#super_kills
+super_kills_rank=person_json['stats']['superKills']['rank']
+super_kills_percentile=person_json['stats']['superKills']['percentile']
+super_kills_value=person_json['stats']['superKills']['value']
+
+#efficiency kda or something
+efficiency_rank=person_json['stats']['efficiency']['rank']
+efficiency_percentile=person_json['stats']['efficiency']['percentile']
+efficiency_value=person_json['stats']['efficiency']['value']
+
+#trials_flawless
+trials_flawless_rank=person_json['stats']['trialsFlawless']['rank']
+trials_flawless_percentile=person_json['stats']['trialsFlawless']['percentile']
+trials_flawless_value=person_json['stats']['trialsFlawless']['value']
+
+#glory_rating
+glory_rating_rank=person_json['stats']['gloryRating']['rank']
+glory_rating_percentile=person_json['stats']['gloryRating']['percentile']
+glory_rating_value=person_json['stats']['gloryRating']['value']
+
+#glory_level 
+glory_level_rank=person_json['stats']['gloryLevel']['rank']
+glory_level_percentile=person_json['stats']['gloryLevel']['percentile']
+glory_level_value=person_json['stats']['gloryLevel']['value']
+
+#valor_rating
+valor_rating_rank=person_json['stats']['valorRating']['rank']
+valor_rating_percentile=person_json['stats']['valorRating']['percentile']
+valor_rating_value=person_json['stats']['valorRating']['value']
+
+#valor_level
+valor_level_rank=person_json['stats']['valorLevel']['rank']
+valor_level_percentile=person_json['stats']['valorLevel']['percentile']
+valor_level_value=person_json['stats']['valorLevel']['value']
+
+#infamy_rating
+infamy_rating_rank=person_json['stats']['infamyRating']['rank']
+infamy_rating_percentile=person_json['stats']['infamyRating']['percentile']
+infamy_rating_value=person_json['stats']['infamyRating']['value']
+
+
 
 driver.close()
+
+
 
 # soup=BeautifulSoup(driver.page_source,'lxml')
 # page_code=''
