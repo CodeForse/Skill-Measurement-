@@ -51,15 +51,17 @@ driver.get(url_tracker_api)
 person_json=json.loads(BeautifulSoup(driver.page_source).text)['data']
 bungie_name= person_json['platformInfo']['platformUserHandle']
 steam_id=person_json['platformInfo']['platformUserIdentifier']
-num_views=person_json['userInfo']['pageViews']
+num_views=person_json['userInfo']['pageviews']
 country_code=person_json['userInfo']['countryCode']
 isSuspicious_by_Tracker=person_json['userInfo']['isSuspicious']
 plays_Trials=person_json['metadata']['playsTrials']
 playing_Trials=person_json['metadata']['playingTrials']
 
-#total info
+#overview total info 
 
 #site_score
+person_json=person_json['segments'][0]
+
 site_score_rank=person_json['stats']['siteScore']['rank']
 site_score_percentile=person_json['stats']['siteScore']['percentile']
 site_score_value=person_json['stats']['siteScore']['value']
@@ -314,10 +316,19 @@ infamy_rating_rank=person_json['stats']['infamyRating']['rank']
 infamy_rating_percentile=person_json['stats']['infamyRating']['percentile']
 infamy_rating_value=person_json['stats']['infamyRating']['value']
 
+# _rank=person_json['stats']['']['rank']
+# _percentile=person_json['stats']['']['percentile']
+# _value=person_json['stats']['']['value']
+
+#the same for any other specific regime 
+
+for name in dir():
+    if(not name.startswith('__')): 
+        myvalue=eval(name)
+        print(name, "is", type(myvalue), "and is equal to ", myvalue)
 
 
 driver.close()
-
 
 
 # soup=BeautifulSoup(driver.page_source,'lxml')
