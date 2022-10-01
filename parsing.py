@@ -237,6 +237,7 @@ def setPlayer(steam_id:str):
 #getAllEmblems()
 if __name__ == '__main__':
     #gettingPlayers.writeAllPlayers(10)
+    print('Aslan was here')
     primeKey_SteamFile=open('primeKeyID.txt','r')
     steam_id_list=primeKey_SteamFile.read().split(',')[:-1]
     
